@@ -107,7 +107,7 @@ class CaperPlusAquarium extends HTMLElement {
     const updated = this.state('ph')?.last_updated;
     const overview = this._tab === 'overview';
     this.shadowRoot.innerHTML = `<style>${styles}</style><div class="app">
-      <header><ha-menu-button></ha-menu-button><span class="brand">◈ CAPERPLUS <small>REEF CONTROL</small></span><span class="badge">Q2 · CLOUD</span></header>
+      <header><ha-menu-button></ha-menu-button><img src="/caperplus-static/logo.svg" width="42" height="42" alt="CaperPlus Aquarium"><span class="brand">CAPERPLUS <small>REEF CONTROL</small></span><span class="badge">Q2 · CLOUD</span></header>
       <main><div class="intro"><div><div class="eyebrow">DEIN MEERWASSER-AQUARIUM</div><h1>Wasser im Blick.</h1><p>Ein ruhiger Überblick über dein Riff.</p></div><div class="device"><label for="device">MESSGERÄT</label><select id="device" ${this._busy?'disabled':''}>${this._devices.map(d=>`<option value="${escapeHtml(d.id)}" ${d.id===this._selected?'selected':''}>${escapeHtml(d.name_by_user || d.name || 'CaperPlus Q2')}</option>`).join('')}</select></div></div>
       <nav><button data-tab="overview" class="${overview?'active':''}">Übersicht</button><button data-tab="calibration" class="${!overview?'active':''}">pH-Kalibrierung</button></nav>
       ${this._message?`<div class="notice" role="status">${escapeHtml(this._message)}</div>`:''}

@@ -3,6 +3,9 @@
 from __future__ import annotations
 
 from typing import Any
+import ssl
+
+import certifi
 
 from aiohttp import ClientError
 
@@ -23,10 +26,18 @@ class CaperPlusApi:
     """Minimal client for the Gizwits endpoints used by the CaperPlus app."""
 
     def __init__(self, hass, username: str, password: str) -> None:
+        self._hass = hass
         self._session = async_get_clientsession(hass)
+        self._ssl_context: ssl.SSLContext | None = None
         self._username = username
         self._password = password
         self._token: str | None = None
+
+    async def _async_get_ssl_context(self) -> ssl.SSLContext:
+        """Use a verified, host-scoped TLS context compatible with Gizwits."""
+        if self._ssl_context is None:
+            self._ssl_context = await self._hass.async_add_executor_job(_create_ssl_context)
+        return self._ssl_context
 
     @property
     def _headers(self) -> dict[str, str]:
@@ -46,11 +57,14 @@ class CaperPlusApi:
                 headers=self._headers,
                 json={"username": self._username, "password": self._password},
                 timeout=30,
+                ssl=await self._async_get_ssl_context(),
             ) as response:
                 data = await response.json(content_type=None)
         except TimeoutError as err:
             raise CaperPlusApiError("Anmeldung: Cloud antwortet nicht innerhalb von 30 Sekunden") from err
         except ClientError as err:
+            if isinstance(getattr(err, "os_error", None), ssl.SSLError):
+                raise CaperPlusApiError(_ssl_error_detail("Anmeldung", err.os_error)) from err
             raise CaperPlusApiError(f"Anmeldung: Verbindungsfehler ({type(err).__name__})") from err
         except ValueError as err:
             raise CaperPlusApiError(f"Anmeldung: ungültige JSON-Antwort (HTTP {response.status})") from err
@@ -71,7 +85,8 @@ class CaperPlusApi:
         for attempt in range(2):
             try:
                 async with self._session.get(
-                    f"{API_BASE_URL}{path}", headers=self._headers, timeout=30
+                    f"{API_BASE_URL}{path}", headers=self._headers, timeout=30,
+                    ssl=await self._async_get_ssl_context(),
                 ) as response:
                     data = await response.json(content_type=None)
             except TimeoutError as err:
@@ -130,7 +145,8 @@ class CaperPlusApi:
             await self.async_login()
         try:
             async with self._session.post(
-                f"{API_BASE_URL}{path}", headers=self._headers, json=payload, timeout=15
+                f"{API_BASE_URL}{path}", headers=self._headers, json=payload, timeout=30,
+                ssl=await self._async_get_ssl_context(),
             ) as response:
                 data = await response.json(content_type=None)
         except (ClientError, TimeoutError, ValueError) as err:
@@ -146,3 +162,23 @@ class CaperPlusApi:
         if not isinstance(data, (dict, list)):
             raise CaperPlusApiError("CaperPlus Cloud returned an invalid control response")
         return data
+
+
+def _create_ssl_context() -> ssl.SSLContext:
+    """Preserve CA/hostname checks; enable the cipher required by api.gizwits.com.
+
+    The endpoint was verified to negotiate TLS 1.2 AES128-SHA. Do not modify
+    Home Assistant's shared context or lower its global TLS security level.
+    """
+    context = ssl.create_default_context(cafile=certifi.where())
+    context.minimum_version = ssl.TLSVersion.TLSv1_2
+    context.set_ciphers(":".join([
+        *[cipher["name"] for cipher in context.get_ciphers()], "AES128-SHA"
+    ]))
+    return context
+
+
+def _ssl_error_detail(phase: str, error: ssl.SSLError) -> str:
+    """Expose only OpenSSL's diagnostic reason, never request data."""
+    reason = getattr(error, "verify_message", None) or getattr(error, "reason", "TLS_ERROR")
+    return f"{phase}: TLS-Verbindung fehlgeschlagen ({reason})"

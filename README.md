@@ -1,5 +1,10 @@
 # CaperPlus Q2 for Home Assistant
 
+![CaperPlus Aquarium Logo](custom_components/caperplus/www/logo.svg)
+
+Version **0.2.2** · [Änderungsprotokoll](CHANGELOG.md) ·
+[Releases](https://github.com/xsiimonox/caperplus-home-assistant/releases)
+
 **Status: experimentell.** Die Datenpunktdefinition wurde erfolgreich aus der
 Cloud abgerufen. Anmeldung, Messwerte und Kalibrierung sind noch nicht an
 einem echten Q2 in Home Assistant getestet. Ein erfolgreicher HTTP-Aufruf
@@ -112,6 +117,11 @@ esptool -p <PORT> -b 460800 read_flash 0 0x400000 caperplus-q2-original.bin
 ```
 
 ## Datenschutz und Betrieb
+
+Ab Version 0.2.2 verwendet ausschließlich der Gizwits-Client zusätzlich die
+vom Server benötigte TLS-1.2-Cipher `AES128-SHA`. Zertifikats- und
+Hostnamenprüfung bleiben aktiviert. Die TLS-Einstellungen anderer
+Home-Assistant-Integrationen werden nicht verändert.
 
 Die Cloud-Variante sendet die Zugangsdaten zur Gizwits-Cloud über HTTPS und
 fragt dort die gebundenen Q2-Geräte ab. Das Passwort wird als Config-Entry in

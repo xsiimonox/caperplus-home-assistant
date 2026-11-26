@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-labelledby="title">
+  <title id="title">CaperPlus Aquarium – Riff und Wasser</title>
+  <defs><linearGradient id="ocean" x2="1" y2="1"><stop stop-color="#42d6d0"/><stop offset="1" stop-color="#70abff"/></linearGradient></defs>
+  <rect x="4" y="4" width="120" height="120" rx="30" fill="#101c2c" stroke="#29445e" stroke-width="2"/>
+  <path d="M22 46Q43 29 64 46T106 46M22 59Q43 42 64 59T106 59" fill="none" stroke="url(#ocean)" stroke-width="5" stroke-linecap="round"/>
+  <g fill="none" stroke="url(#ocean)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M64 104V76M64 88L47 75V67M64 96L83 81V69M48 76L38 77M83 82L95 83"/>
+  </g><circle cx="88" cy="28" r="4" fill="#42d6d0"/><circle cx="100" cy="22" r="2" fill="#70abff"/>
+</svg>
