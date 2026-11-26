@@ -45,16 +45,22 @@ class CaperPlusApi:
                 f"{API_BASE_URL}/app/login",
                 headers=self._headers,
                 json={"username": self._username, "password": self._password},
-                timeout=15,
+                timeout=30,
             ) as response:
                 data = await response.json(content_type=None)
-        except (ClientError, TimeoutError, ValueError) as err:
-            raise CaperPlusApiError("Could not connect to the CaperPlus Cloud") from err
+        except TimeoutError as err:
+            raise CaperPlusApiError("Anmeldung: Cloud antwortet nicht innerhalb von 30 Sekunden") from err
+        except ClientError as err:
+            raise CaperPlusApiError(f"Anmeldung: Verbindungsfehler ({type(err).__name__})") from err
+        except ValueError as err:
+            raise CaperPlusApiError(f"Anmeldung: ungültige JSON-Antwort (HTTP {response.status})") from err
 
-        if response.status in (401, 403) or not isinstance(data, dict) or not data.get("token"):
+        if response.status in (400, 401, 403):
             raise CaperPlusAuthError("CaperPlus login was rejected")
         if response.status >= 400:
             raise CaperPlusApiError(f"CaperPlus login failed ({response.status})")
+        if not isinstance(data, dict) or not data.get("token"):
+            raise CaperPlusApiError("Anmeldung: Cloud-Antwort enthält kein Sitzungstoken")
         self._token = data["token"]
 
     async def _async_get(self, path: str) -> dict[str, Any] | list[Any]:
@@ -65,11 +71,15 @@ class CaperPlusApi:
         for attempt in range(2):
             try:
                 async with self._session.get(
-                    f"{API_BASE_URL}{path}", headers=self._headers, timeout=15
+                    f"{API_BASE_URL}{path}", headers=self._headers, timeout=30
                 ) as response:
                     data = await response.json(content_type=None)
-            except (ClientError, TimeoutError, ValueError) as err:
-                raise CaperPlusApiError("Could not read data from the CaperPlus Cloud") from err
+            except TimeoutError as err:
+                raise CaperPlusApiError("Datenabruf: Cloud antwortet nicht innerhalb von 30 Sekunden") from err
+            except ClientError as err:
+                raise CaperPlusApiError(f"Datenabruf: Verbindungsfehler ({type(err).__name__})") from err
+            except ValueError as err:
+                raise CaperPlusApiError(f"Datenabruf: ungültige JSON-Antwort (HTTP {response.status})") from err
 
             if response.status in (401, 403) and attempt == 0:
                 self._token = None

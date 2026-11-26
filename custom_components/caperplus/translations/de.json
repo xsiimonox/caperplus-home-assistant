@@ -12,7 +12,7 @@
     },
     "error": {
       "invalid_auth": "Anmeldung abgelehnt.",
-      "cannot_connect": "CaperPlus Cloud ist nicht erreichbar.",
+      "cannot_connect": "Cloud-Verbindung fehlgeschlagen: {detail}",
       "no_q2_devices": "In diesem Konto wurde kein CaperPlus Q2 gefunden."
     }
   }
