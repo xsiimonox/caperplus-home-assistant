@@ -1,0 +1,19 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "CaperPlus Cloud verbinden",
+        "description": "Melde dich mit demselben Konto an, das du in der CaperPlus-App verwendest.",
+        "data": {
+          "username": "E-Mail-Adresse oder Benutzername",
+          "password": "Passwort"
+        }
+      }
+    },
+    "error": {
+      "invalid_auth": "Anmeldung abgelehnt.",
+      "cannot_connect": "CaperPlus Cloud ist nicht erreichbar.",
+      "no_q2_devices": "In diesem Konto wurde kein CaperPlus Q2 gefunden."
+    }
+  }
+}
