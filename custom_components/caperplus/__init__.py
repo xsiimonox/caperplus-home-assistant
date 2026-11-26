@@ -5,7 +5,8 @@ from functools import partial
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
+from homeassistant.core import HomeAssistant, SupportsResponse
+from homeassistant.exceptions import HomeAssistantError
 import voluptuous as vol
 from homeassistant.helpers import config_validation as cv
 
@@ -13,11 +14,12 @@ from .api import CaperPlusApi
 from .const import CONF_PASSWORD, CONF_USERNAME, DOMAIN
 from .api import CaperPlusApiError
 from .coordinator import CaperPlusCoordinator
+from .panel import async_register_panel, async_remove_panel
 
 PLATFORMS: list[Platform] = [Platform.SENSOR]
 
 
-async def _async_calibrate_ph(hass: HomeAssistant, call) -> None:
+async def _async_calibrate_ph(hass: HomeAssistant, call) -> dict:
     """Start pH calibration for a configured CaperPlus device."""
     device_id = call.data["device_id"]
     target_ph = call.data["target_ph"]
@@ -31,8 +33,11 @@ async def _async_calibrate_ph(hass: HomeAssistant, call) -> None:
     did = identifier[1]
     for coordinator in hass.data[DOMAIN].values():
         if did in coordinator.devices:
-            await coordinator.async_calibrate_ph(did, target_ph)
-            return
+            try:
+                await coordinator.async_calibrate_ph(did, target_ph)
+            except CaperPlusApiError as err:
+                raise HomeAssistantError(str(err)) from err
+            return {"status": "confirmed"}
     raise vol.Invalid("CaperPlus device is not loaded")
 
 
@@ -54,6 +59,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             DOMAIN,
             "calibrate_ph",
             partial(_async_calibrate_ph, hass),
+            supports_response=SupportsResponse.OPTIONAL,
             schema=vol.Schema(
                 {
                     vol.Required("device_id"): cv.string,
@@ -62,6 +68,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             ),
         )
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
+    if len(hass.data[DOMAIN]) == 1:
+        await async_register_panel(hass)
     return True
 
 
@@ -72,4 +80,5 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         hass.data[DOMAIN].pop(entry.entry_id)
         if not hass.data[DOMAIN]:
             hass.services.async_remove(DOMAIN, "calibrate_ph")
+            async_remove_panel(hass)
     return unloaded

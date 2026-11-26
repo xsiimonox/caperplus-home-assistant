@@ -22,6 +22,33 @@ Die Integration legt für jedes Q2 pH-, Wassertemperatur-, TDS- und
 WLAN-Signal-Sensoren an. Werte werden etwa einmal pro Minute aus der Cloud
 abgefragt.
 
+## Aquarium-Oberfläche in der Seitenleiste
+
+Ab Version 0.2.0 erscheint nach Einrichtung und Neustart automatisch
+**CaperPlus Aquarium** in der Home-Assistant-Seitenleiste. Eine eigene
+Dashboard-YAML ist dafür nicht nötig.
+
+- Dunkle Meerwasser-Optik mit Türkis- und Blautönen, auch für das Smartphone.
+- Geräteauswahl bei mehreren Q2-Geräten.
+- Aktueller pH, Wassertemperatur und TDS mit Verknüpfung zum HA-Detaildialog.
+- Separate Verlaufskurven mit Zeitachse und Minimum/Maximum: 6 h, 24 h, 7 Tage.
+- WLAN-Signal und Zeitpunkt der letzten HA-Zustandsaktualisierung.
+- Geführte Kalibrierung mit Pufferwahl, Bestätigung der Vorbereitung und
+  Rückmeldung nach Abschluss oder Fehler.
+
+Die Kurven benötigen die Home-Assistant-Komponenten `history` und `recorder`
+(üblicherweise über `default_config` aktiv). Die Q2-Sensoren dürfen von der
+Aufzeichnung nicht ausgeschlossen sein. Bei einer Neuinstallation entstehen
+Verläufe erst im Betrieb. Es werden keine Hersteller-Cloud-Historien importiert.
+Der Zeitstempel ist der HA-Zustandszeitpunkt, kein Nachweis für eine neue
+Messung am Gerät. TDS ist kein Ersatz für eine Salinitätsmessung im Meerwasser.
+
+Nach einem Update den vollständigen Ordner `custom_components/caperplus`
+einschließlich `www` ersetzen und Home Assistant neu starten. Wenn das Panel
+fehlt oder veraltet aussieht, die Browserseite neu laden. Das Seitenleistenpanel
+nutzt die Geräte- und Entitätsregistrierung von Home Assistant; der angemeldete
+HA-Benutzer benötigt Zugriff auf diese Registrierungen.
+
 ## pH-Sonde kalibrieren
 
 Die Q2-Firmware unterstützt die Kalibrierung über die Gizwits-Steuer-API. Die
