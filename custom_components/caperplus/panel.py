@@ -22,7 +22,7 @@ async def async_register_panel(hass):
         frontend_url_path=PANEL,
         sidebar_title="CaperPlus Aquarium",
         sidebar_icon="mdi:fish",
-        module_url=f"{URL}/aquarium.js?v=0.2.2",
+        module_url=f"{URL}/aquarium.js?v=0.3.0",
         require_admin=False,
     )
 

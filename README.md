@@ -2,7 +2,7 @@
 
 ![CaperPlus Aquarium Logo](custom_components/caperplus/www/logo.svg)
 
-Version **0.2.2** · [Änderungsprotokoll](CHANGELOG.md) ·
+Version **0.3.0** · [Änderungsprotokoll](CHANGELOG.md) ·
 [Releases](https://github.com/xsiimonox/caperplus-home-assistant/releases)
 
 **Status: experimentell.** Die Datenpunktdefinition wurde erfolgreich aus der
@@ -140,3 +140,7 @@ und Verfügbarkeit des Gizwits-Dienstes abhängig.
 
 Beiträge und Fehlerberichte sind willkommen. Bitte keine Kontopasswörter,
 Tokens oder privaten Gerätekennungen in Issues posten.
+
+## Aquarium Design 0.3.0
+
+Diese Version verwendet die gemeinsame Aquarium-Designsprache 0.2.0 mit Hell-/Dunkelmodus, türkisem Akzent, einheitlichen Karten und mindestens 44 Pixel hohen Standardbedienelementen. Die Gestaltung ist im Paket enthalten; kein Zugriff auf eine zentrale Website ist erforderlich. Vorhandene Gerätefunktionen und Freigabegrenzen gelten weiter. Nach dem Update Home Assistant vollständig neu starten und die Ansicht neu laden. ESP-Oberflächen benötigen die zugehörige neue Firmware; ein HA-Update flasht keinen ESP automatisch.

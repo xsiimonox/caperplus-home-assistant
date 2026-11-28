@@ -3,10 +3,14 @@
   "name": "CaperPlus Cloud",
   "codeowners": [],
   "config_flow": true,
-  "dependencies": ["panel_custom", "http", "frontend"],
+  "dependencies": [
+    "panel_custom",
+    "http",
+    "frontend"
+  ],
   "documentation": "https://github.com/xsiimonox/caperplus-home-assistant",
   "issue_tracker": "https://github.com/xsiimonox/caperplus-home-assistant/issues",
   "iot_class": "cloud_polling",
   "requirements": [],
-  "version": "0.2.2"
+  "version": "0.3.0"
 }

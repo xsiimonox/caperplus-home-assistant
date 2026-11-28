@@ -1,0 +1,40 @@
+name: Publish Aquarium design release
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: aquarium-release-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  release:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: python tools/validate_design.py
+      - run: node --check custom_components/caperplus/www/aquarium.js
+      - name: Package integration
+        run: |
+          mkdir -p dist
+          zip -r dist/caperplus.zip custom_components/caperplus -x '*/__pycache__/*' '*.pyc'
+      - name: Read version
+        id: version
+        run: python -c 'import json,os; v=json.load(open("custom_components/caperplus/manifest.json"))["version"]; open(os.environ["GITHUB_OUTPUT"],"a").write("value="+v+"\n")'
+      - name: Publish numbered HACS release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.version.outputs.value }}
+        run: |
+          if gh release view "v$VERSION" >/dev/null 2>&1; then
+            echo "Release already exists; preserving it."
+          else
+            gh release create "v$VERSION" dist/*.zip --target "$GITHUB_SHA" --latest --title "Aquarium Design v$VERSION" --notes-file RELEASE_NOTES.md
+          fi

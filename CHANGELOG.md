@@ -1,5 +1,12 @@
 # Änderungsprotokoll
 
+## 0.3.0
+
+- Gemeinsame Aquarium-Designsprache 0.2.0: Türkis, einheitliche Karten, Typografie, Bedienelemente und Tastaturfokus.
+- Hell-/Dunkelmodus folgt Home Assistant beziehungsweise dem Browser in eigenständigen Ansichten.
+- Gerätefunktionen, Eingabeentwürfe und vorhandene Funktionssperren bleiben erhalten.
+
+
 Versionsschema: MAJOR.MINOR.PATCH. Neue Funktionen erhöhen MINOR,
 Fehlerkorrekturen PATCH; inkompatible Änderungen erhöhen MAJOR.
 
